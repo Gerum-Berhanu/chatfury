@@ -11,10 +11,7 @@ rooms = {}
 
 def generate_unique_code(length):
     while True:
-        code = ""
-        for _ in range(length):
-            code += random.choice(ascii_uppercase)
-
+        code = "".join(random.choice(ascii_uppercase) for _ in range(length))
         if code not in rooms:
             break
     return code
@@ -23,22 +20,22 @@ def generate_unique_code(length):
 def home():
     session.clear()
     if request.method == "POST":
-        name = request.form.get("name", False)
-        code = request.form.get("code", False)
-        join = request.form.get("join", False)
-        create = request.form.get("create", False)
+        name = request.form.get("name")
+        code = request.form.get("code")
+        join = request.form.get("join")
+        create = request.form.get("create")
 
         if not name:
             return render_template("home.html", error="Please enter a name", code=code, name=name)
 
-        if join != False and not code:
+        if join and not code:
             return render_template("home.html", error="Please enter a room code", code=code, name=name)
             
         room = code
-        if create != False:
+        if create:
             room = generate_unique_code(4)
             rooms[room] = {"members": 0, "messages": []}
-        elif join != False and code not in rooms: # Because new room is not being created, they must be joining a room
+        elif join and code not in rooms:  # Because new room is not being created, they must be joining a room
             return render_template("home.html", error="Room does not exist", code=code, name=name)
 
         session["room"] = room
@@ -55,7 +52,7 @@ def room():
     return render_template("room.html", room=room, messages=rooms[room]["messages"])
 
 @socketio.on("message")
-def message(data):
+def handle_message(data):
     room = session.get("room")
     if room not in rooms:
         return
@@ -68,7 +65,7 @@ def message(data):
     print(f"{session.get('name')} said: {data['data']}")
 
 @socketio.on("connect")
-def connect(auth):
+def handle_connect(auth):
     room = session.get("room")
     name = session.get("name")
     if not room or not name:
@@ -77,23 +74,22 @@ def connect(auth):
         leave_room(room)
         return
     join_room(room)
-    send({"name":name,"message":"has entered the room"}, to=room)
+    send({"name": name, "message": "has entered the room"}, to=room)
     rooms[room]["members"] += 1
     print(f"{name} joined room {room}")
 
 @socketio.on("disconnect")
-def disconnect():
+def handle_disconnect():
     room = session.get("room")
     name = session.get("name")
-    leave_room(room)
-
-    if room in rooms:
-        rooms[room]["members"] -= 1
-        if rooms[room]["members"] <= 0:
-            del rooms[room] # delete the room if everyone leaves
-    
-    send({"name":name,"message":"has left the room"}, to=room)
-    print(f"{name} left room {room}")
+    if room and name:
+        leave_room(room)
+        if room in rooms:
+            rooms[room]["members"] -= 1
+            if rooms[room]["members"] <= 0:
+                del rooms[room]  # delete the room if everyone leaves
+        send({"name": name, "message": "has left the room"}, to=room)
+        print(f"{name} left room {room}")
 
 if __name__ == "__main__":
     socketio.run(app, debug=True, port=4004)
