@@ -73,7 +73,7 @@ def connect(auth):
     name = session.get("name")
     if not room or not name:
         return
-    if room not in room:
+    if room not in rooms:
         leave_room(room)
         return
     join_room(room)
