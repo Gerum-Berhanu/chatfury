@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include '/mini-static/head.html' %}
+    <title>Chat Fury</title>
+</head>
+<body class="vh-100 d-flex">
+    <div class="container-fluid flex-grow-1 d-flex flex-column align-items-center bg-warning">
+        {% if error %}
+        <nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-danger">
+            <div class="container-fluid d-flex justify-content-center">
+                <h2 class="text-white">{{error}}</h1>
+            </div>
+        </nav>
+        {% endif %}
+        <div class="row flex-grow-1 d-flex align-items-center justify-content-center">
+            <div class="container bg-light shadow-lg rounded-4 border border-2 border-dark p-5">
+                <form method="post" class="d-grid gap-3">
+                    <div>
+                        <input type="text" name="name" value="{{name}}" class="form-control-lg" placeholder="Pick a name!">
+                    </div>
+                    <div>
+                        <input type="text" name="code" value="{{code}}" class="form-control-lg" placeholder="Room Code">
+                    </div>
+                    <div class="d-flex flex-column">
+                        <button type="submit" class="col-12 fs-6 mb-1 btn btn-dark btn-outline-danger" name="join" value="join">Join Room</button>
+                        <button type="submit" class="col-12 fs-6 btn btn-dark btn-outline-info" name="create" value="create">Create Room</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

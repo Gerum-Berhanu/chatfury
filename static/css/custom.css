@@ -1,0 +1,11 @@
+.ct-bg-white-5 {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.ct-bg-blue-5 {
+    background-color: rgba(0, 0, 255, 0.5);
+}
+
+.ct-border-dashed-white {
+    border: 5px dashed white;
+}
